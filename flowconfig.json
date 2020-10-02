@@ -1,0 +1,27 @@
+{
+	"httpserver": {
+		"statics": "./html",
+		"index_page": "index.html",
+		"host": "localhost",
+		"port": 8080
+	},
+	"jdbc_pools": {
+		"flowdb": {
+			"url": "jdbc:hsqldb:file:./db/flowdb;shutdown=true;create=true",
+			"driver_class": "org.hsqldb.jdbcDriver",
+			"max_pool_size": 5,
+			"user": "SA",
+			"password": ""
+		}
+	},
+	"services": {
+		"node_manager.app": {
+			"class":"NodeManagerService",
+			"jdbc":"flowdb"
+		},
+		"flow_manager.app": {
+			"class":"FlowManagerService",
+			"jdbc":"flowdb"
+		}
+	}
+}

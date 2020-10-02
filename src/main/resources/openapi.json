@@ -1,0 +1,364 @@
+{
+	"openapi": "3.0.0",
+	"info": {
+		"title": "Micro flow API",
+		"version": "1.0.0"
+	},
+	"paths": {
+		"/api/nodes": {
+			"get": {
+				"operationId": "getNodeList",
+				"x-vertx-event-bus": "node_manager.app",
+				"parameters": [
+					{
+						"name": "folder",
+						"in": "query",
+						"description": "",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "node_type",
+						"in": "query",
+						"description": "",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "owner",
+						"in": "query",
+						"description": "",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"type": "string"
+						}
+					},
+					{
+						"name": "name",
+						"in": "query",
+						"description": "",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"items": { "$ref": "#/components/schemas/Node" }
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Something wrong happened !"
+					}					
+				}
+			},			
+			"post": {
+				"operationId": "createNode",
+				"x-vertx-event-bus": "node_manager.app",
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Node"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Ok"
+					},
+					"500": {
+						"description": "Something wrong happened !"
+					}					
+				}
+			}
+		},
+		"/api/node/{nodeId}": {
+			"parameters": [
+				{
+					"name": "nodeId",
+					"in": "path",
+					"required": true,
+					"schema": {
+						"type": "integer"
+					}
+				}
+			],
+			"get": {
+				"operationId": "getNode",
+				"x-vertx-event-bus": "node_manager.app",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"items": { "$ref": "#/components/schemas/Node" }
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Node not found !"
+					},
+					"500": {
+						"description": "Something wrong happened !"
+					}					
+				}
+			},
+			"put": {
+				"operationId": "updateNode",
+				"x-vertx-event-bus": "node_manager.app",
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Node"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/Node"
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Node not found !"
+					},
+					"500": {
+						"description": "Something wrong happened !"
+					}
+				}
+			},
+			"delete": {
+				"operationId": "deletNode",
+				"x-vertx-event-bus": "node_manager.app",
+				"responses": {
+					"200": {
+						"description": "Ok"
+					},
+					"404": {
+						"description": "Node not found !"
+					},
+					"500": {
+						"description": "Something wrong happened !"
+					}					
+				}
+			}
+		},
+		"/api/flow/{nodeId}": {
+			"parameters": [
+				{
+					"name": "nodeId",
+					"in": "path",
+					"required": true,
+					"schema": {
+						"type": "integer"					
+					}
+				}
+			],
+			"get": {
+				"operationId": "getFlowList",
+				"x-vertx-event-bus": "flow_manager.app",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"items": { "$ref": "#/components/schemas/Flow" }
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Flow not found !"
+					},
+					"500": {
+						"description": "Something wrowng happened !"
+					}
+				}			
+			},
+			"post": {
+				"operationId": "createFlow",
+				"x-vertx-event-bus": "flow_manager.app",
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/Flow"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Ok"
+					},
+					"500": {
+						"description": "Something wrong happened !"
+					}
+				}			
+			}
+		},
+		"/api/flow/xml/{flowId}": {
+			"parameters": [
+				{
+					"name": "flowId",
+					"in": "path",
+					"required": true,
+					"schema": {
+						"type": "integer"					
+					}
+				}
+			],
+			"get": {
+				"operationId": "getFlowXml",
+				"x-vertx-event-bus": "flow_manager.app",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"items": { "$ref": "#/components/schemas/FlowXml" }
+								}
+							}
+						}
+					},
+					"500": {
+						"description": "Something wrong happened !"
+					}
+				}			
+			},
+			"post": {
+				"operationId": "createFlowXml",
+				"x-vertx-event-bus": "flow_manager.app",
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/FlowXml"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Ok"
+					},
+					"500": {
+						"description": "Something wrong happened !"
+					}
+				}			
+			},
+			"put": {
+				"operationId": "setCurrentFlowXml",
+				"x-vertx-event-bus": "flow_manager.app",
+				"responses": {
+					"200": {
+						"description": "Ok"
+					},
+					"500": {
+						"description": "Something wrong happened !"
+					}
+				}			
+			}		
+		}		
+	},
+	"components": {
+		"schemas": {
+			"Node": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "number",
+						"format": "integer"
+					},
+					"name": {
+						"type": "string"
+					},
+					"node_type": {
+						"type": "string"
+					},
+					"folder": {
+						"type": "number",
+						"format": "integer"
+					},
+					"description": {
+						"type": "string"
+					},
+					"create_date": {
+						"type": "string",
+						"format": "date-time"
+					}
+				}
+			},
+			"Flow": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "number",
+						"format": "integer"
+					},
+					"node_id": {
+						"type": "number",
+						"format": "integer"
+					},
+					"is_current": {
+						"type": "number",
+						"format": "integer"
+					},
+					"create_date": {
+						"type": "string",
+						"format": "date-time"
+					}
+				}
+			},
+			"FlowXml": {
+				"type": "object",
+				"properties": {
+					"id": {
+						"type": "number",
+						"format": "integer"
+					},
+					"content_xml": {
+						"type": "string"
+					}
+				}
+			}
+			
+		}
+	}
+}
