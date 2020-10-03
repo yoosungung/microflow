@@ -17,11 +17,16 @@ import io.vertx.core.http.HttpServerOptions;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import io.vertx.ext.auth.jdbc.JDBCAuth;
 import io.vertx.ext.jdbc.JDBCClient;
 import io.vertx.ext.sql.SQLClient;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.api.contract.openapi3.OpenAPI3RouterFactory;
+import io.vertx.ext.web.handler.AuthHandler;
+import io.vertx.ext.web.handler.BasicAuthHandler;
+import io.vertx.ext.web.handler.SessionHandler;
 import io.vertx.ext.web.handler.StaticHandler;
+import io.vertx.ext.web.sstore.LocalSessionStore;
 import io.vertx.serviceproxy.ServiceBinder;
 
 public class MainVerticle extends AbstractVerticle {
@@ -145,14 +150,25 @@ public class MainVerticle extends AbstractVerticle {
 				
 				// Generate the router
 				Router router = routerFactory.getRouter();
-				router.get("/statics/*").handler(StaticHandler.create(conf.getString("statics", "./html")).setIndexPage(conf.getString("index_page", "index.html")));
-		
+
+				LOGGER.info("httpserver: statics=" + conf.getString("statics","./webroot"));
+				router.get("/statics/*").handler(StaticHandler.create(conf.getString("statics", "./webroot")).setIndexPage(conf.getString("index_page", "index.html")));
+				
+				LOGGER.info("httpserver: session");
+				router.route().handler(SessionHandler.create(LocalSessionStore.create(vertx)));
+				
+				LOGGER.info("httpserver: auth=flowdb");
+				JDBCClient jdbcClient = (JDBCClient)App.dbcpools.get("flowdb");
+				JDBCAuth authProvider = JDBCAuth.create(vertx, jdbcClient);			
+				AuthHandler basicAuthHandler = BasicAuthHandler.create(authProvider);
+				router.route("/api/*").handler(basicAuthHandler);	
+
 				LOGGER.info("httpserver: start");
 				server = vertx.createHttpServer(new HttpServerOptions().setPort(conf.getInteger("port", 8080)).setHost(conf.getString("host", "localhost")));
 				
 				server.requestHandler(router).listen(ar -> {
 					if (ar.succeeded()) {
-						LOGGER.info("httpserver: listen");
+						LOGGER.info("httpserver: listen=" + conf.getInteger("port",8080));
 						promise.complete();
 					}
 					else {

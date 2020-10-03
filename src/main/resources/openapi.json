@@ -63,6 +63,9 @@
 							}
 						}
 					},
+					"401": {
+						"description": "Not authoized !"
+					},
 					"500": {
 						"description": "Something wrong happened !"
 					}					
@@ -84,6 +87,9 @@
 				"responses": {
 					"200": {
 						"description": "Ok"
+					},
+					"401": {
+						"description": "Not authoized !"
 					},
 					"500": {
 						"description": "Something wrong happened !"
@@ -120,6 +126,9 @@
 					"404": {
 						"description": "Node not found !"
 					},
+					"401": {
+						"description": "Not authoized !"
+					},
 					"500": {
 						"description": "Something wrong happened !"
 					}					
@@ -149,6 +158,9 @@
 							}
 						}
 					},
+					"401": {
+						"description": "Not authoized !"
+					},
 					"404": {
 						"description": "Node not found !"
 					},
@@ -163,6 +175,9 @@
 				"responses": {
 					"200": {
 						"description": "Ok"
+					},
+					"401": {
+						"description": "Not authoized !"
 					},
 					"404": {
 						"description": "Node not found !"
@@ -199,6 +214,9 @@
 							}
 						}
 					},
+					"401": {
+						"description": "Not authoized !"
+					},
 					"404": {
 						"description": "Flow not found !"
 					},
@@ -223,6 +241,9 @@
 				"responses": {
 					"200": {
 						"description": "Ok"
+					},
+					"401": {
+						"description": "Not authoized !"
 					},
 					"500": {
 						"description": "Something wrong happened !"
@@ -256,6 +277,9 @@
 							}
 						}
 					},
+					"401": {
+						"description": "Not authoized !"
+					},
 					"500": {
 						"description": "Something wrong happened !"
 					}
@@ -278,6 +302,9 @@
 					"200": {
 						"description": "Ok"
 					},
+					"401": {
+						"description": "Not authoized !"
+					},
 					"500": {
 						"description": "Something wrong happened !"
 					}
@@ -290,6 +317,9 @@
 					"200": {
 						"description": "Ok"
 					},
+					"401": {
+						"description": "Not authoized !"
+					},
 					"500": {
 						"description": "Something wrong happened !"
 					}
@@ -299,6 +329,18 @@
 	},
 	"components": {
 		"schemas": {
+			"User": {
+				"type": "object",
+				"properties": {
+					"username": {
+						"type": "string"
+					},
+					"password": {
+						"type": "string"
+					}
+				}
+			},
+			
 			"Node": {
 				"type": "object",
 				"properties": {

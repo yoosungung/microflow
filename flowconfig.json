@@ -17,11 +17,13 @@
 	"services": {
 		"node_manager.app": {
 			"class":"NodeManagerService",
-			"jdbc":"flowdb"
+			"jdbc":"flowdb",
+			"create_table": false
 		},
 		"flow_manager.app": {
 			"class":"FlowManagerService",
-			"jdbc":"flowdb"
+			"jdbc":"flowdb",
+			"create_table": false
 		}
 	}
 }

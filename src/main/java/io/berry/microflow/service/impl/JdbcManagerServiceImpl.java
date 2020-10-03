@@ -19,7 +19,9 @@ public abstract class JdbcManagerServiceImpl {
 	protected SQLClient getSQLClient(String jdbc_name) {
 		if(dbclient == null) {
 			dbclient = App.dbcpools.get(jdbc_name);
-			initServiceTables();
+			if(config.getBoolean("create_table", false)) {
+				initServiceTables();
+			}
 		}
 		return dbclient;
 	}
