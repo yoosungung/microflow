@@ -1,6 +1,6 @@
 {
 	"httpserver": {
-		"statics": "./html",
+		"statics": "./webroot",
 		"index_page": "index.html",
 		"host": "localhost",
 		"port": 8080

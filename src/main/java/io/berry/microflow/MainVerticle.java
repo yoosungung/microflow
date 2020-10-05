@@ -23,7 +23,8 @@ import io.vertx.ext.sql.SQLClient;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.api.contract.openapi3.OpenAPI3RouterFactory;
 import io.vertx.ext.web.handler.AuthHandler;
-import io.vertx.ext.web.handler.BasicAuthHandler;
+import io.vertx.ext.web.handler.FormLoginHandler;
+import io.vertx.ext.web.handler.RedirectAuthHandler;
 import io.vertx.ext.web.handler.SessionHandler;
 import io.vertx.ext.web.handler.StaticHandler;
 import io.vertx.ext.web.sstore.LocalSessionStore;
@@ -152,7 +153,7 @@ public class MainVerticle extends AbstractVerticle {
 				Router router = routerFactory.getRouter();
 
 				LOGGER.info("httpserver: statics=" + conf.getString("statics","./webroot"));
-				router.get("/statics/*").handler(StaticHandler.create(conf.getString("statics", "./webroot")).setIndexPage(conf.getString("index_page", "index.html")));
+				router.get("/statics").handler(StaticHandler.create(conf.getString("statics", "./webroot")).setIndexPage(conf.getString("index_page", "index.html")));
 				
 				LOGGER.info("httpserver: session");
 				router.route().handler(SessionHandler.create(LocalSessionStore.create(vertx)));
@@ -160,8 +161,10 @@ public class MainVerticle extends AbstractVerticle {
 				LOGGER.info("httpserver: auth=flowdb");
 				JDBCClient jdbcClient = (JDBCClient)App.dbcpools.get("flowdb");
 				JDBCAuth authProvider = JDBCAuth.create(vertx, jdbcClient);			
-				AuthHandler basicAuthHandler = BasicAuthHandler.create(authProvider);
-				router.route("/api/*").handler(basicAuthHandler);	
+				AuthHandler redirectAuthHandler = RedirectAuthHandler.create(authProvider);
+				router.route("/statics/*").handler(redirectAuthHandler);
+				router.route("/loginpage").handler(rc -> rc.response().putHeader("content-type","text/html").end(getLoginHtml()));
+				router.post("/login").handler(FormLoginHandler.create(authProvider));
 
 				LOGGER.info("httpserver: start");
 				server = vertx.createHttpServer(new HttpServerOptions().setPort(conf.getInteger("port", 8080)).setHost(conf.getString("host", "localhost")));
@@ -183,6 +186,70 @@ public class MainVerticle extends AbstractVerticle {
 		});
 	    
 	    return promise.future();
+	}
+
+	private String getLoginHtml() {
+		String str_html = "<!DOCTYPE html>"
+				+ "<html>"
+				+ "<head>"
+				+ "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">"
+				+ "<title> Login Page </title>"
+				+ "<style>"
+				+ "Body {"
+				+ "  font-family: Calibri, Helvetica, sans-serif;"
+				+ "  background-color: gray;"
+				+ "}"
+				+ "button {"
+				+ "       background-color: #4CAF50;"
+				+ "       width: 100%;"
+				+ "        color: orange;"
+				+ "        padding: 15px;"
+				+ "        margin: 10px 0px;"
+				+ "        border: none;"
+				+ "        cursor: pointer;"
+				+ "}"
+				+ " form {"
+				+ "        border: 3px solid #f1f1f1;"
+				+ "}"
+				+ " input[type=text], input[type=password] {"
+				+ "        width: 100%;"
+				+ "        margin: 8px 0;"
+				+ "        padding: 12px 20px;"
+				+ "        display: inline-block;"
+				+ "        border: 2px solid green;"
+				+ "        box-sizing: border-box;"
+				+ "}"
+				+ " button:hover {"
+				+ "        opacity: 0.7;"
+				+ "}"
+				+ "  .cancelbtn {"
+				+ "        width: auto;"
+				+ "        padding: 10px 18px;"
+				+ "        margin: 10px 5px;"
+				+ "}"
+				+ " .container {"
+				+ "        padding: 25px;"
+				+ "        background-color: lightblue;"
+				+ "}"
+				+ "</style>"
+				+ "</head>"
+				+ "<body>"
+				+ "    <center> <h1>Login</h1> </center>"
+				+ "    <form action=\"/login\" method=\"post\">"
+				+ "        <div class=\"container\">"
+				+ "            <label>Username : </label>"
+				+ "            <input type=\"text\" placeholder=\"Enter Username\" name=\"username\" required>"
+				+ "            <label>Password : </label>"
+				+ "            <input type=\"password\" placeholder=\"Enter Password\" name=\"password\" required>"
+				+ "            <button type=\"submit\">Login</button>"
+				+ "            <input type=\"checkbox\" checked=\"checked\"> Remember me"
+				+ "            <button type=\"button\" class=\"cancelbtn\"> Cancel</button>"
+				+ "            Forgot <a href=\"#\"> password? </a>"
+				+ "        </div>"
+				+ "    </form>"
+				+ "</body>"
+				+ "</html>";
+		return str_html;
 	}
 
 	@Override

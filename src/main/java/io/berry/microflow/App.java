@@ -11,7 +11,6 @@ public class App {
 	
 	public static Map<String, SQLClient> dbcpools = new HashMap<>();
 
-
 	public static void main(String[] args) {
 		VertxOptions vxOptions = new VertxOptions().setBlockedThreadCheckInterval(200000000);
 		Vertx vertx = Vertx.vertx(vxOptions);
