@@ -8,6 +8,7 @@ if [ -z "$CURRENT_PID" ]; then
 fi
 
 git pull
+git checkout master
 
 mvn clean package
 
