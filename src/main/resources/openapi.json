@@ -4,7 +4,163 @@
 		"title": "Micro flow API",
 		"version": "1.0.0"
 	},
+	
 	"paths": {
+		"/api/users": {
+			"get": {
+				"operationId": "getUserList",
+				"x-vertx-event-bus": "user_manager.app",
+				"parameters": [
+					{
+						"name": "username",
+						"in": "query",
+						"description": "",
+						"style": "form",
+						"explode": false,
+						"schema": {
+							"type": "string"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"items": { "$ref": "#/components/schemas/User" }
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Not authoized !"
+					},
+					"500": {
+						"description": "Something wrong happened !"
+					}
+				}
+			},
+			"post": {
+				"operationId": "createUser",
+				"x-vertx-event-bus": "user_manager.app",
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/User"
+							}
+						}
+					}
+				},
+				"repose": {
+					"200": {
+						"description": "Ok"
+					},
+					"401": {
+						"description": "Not authoized !"
+					},
+					"500": {
+						"description": "Something wrong happened !"
+					}					
+				}
+			}
+		},
+		
+		"/api/user/{username}": {
+			"parameter": [
+				{
+					"name": "username",
+					"in": "path",
+					"require": true,
+					"schema": {
+						"type": "string"
+					}
+				}
+			],
+			"get": {
+				"operationId": "getUser",
+				"x-vertx-event-bus": "user_manager.app",
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"type": "array",
+									"items": { "$ref": "#/components/schemas/User" }
+								}
+							}
+						}
+					},
+					"404": {
+						"description": "Node not found !"
+					},
+					"401": {
+						"description": "Not authoized !"
+					},
+					"500": {
+						"description": "Something wrong happened !"
+					}					
+				}
+			},
+			"put": {
+				"operationId": "updateUser",
+				"x-vertx-event-bus": "user_manager.app",
+				"requestBody": {
+					"required": true,
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/User"
+							}
+						}
+					}
+				},
+				"responses": {
+					"200": {
+						"description": "Ok",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/User"
+								}
+							}
+						}
+					},
+					"401": {
+						"description": "Not authoized !"
+					},
+					"404": {
+						"description": "Node not found !"
+					},
+					"500": {
+						"description": "Something wrong happened !"
+					}
+				}
+			},
+			"delete": {
+				"operationId": "deleteUser",
+				"x-vertx-event-bus": "user_manager.app",
+				"responses": {
+					"200": {
+						"description": "Ok"
+					},
+					"401": {
+						"description": "Not authoized !"
+					},
+					"404": {
+						"description": "Node not found !"
+					},
+					"500": {
+						"description": "Something wrong happened !"
+					}					
+				}
+			}
+		},
+	
 		"/api/nodes": {
 			"get": {
 				"operationId": "getNodeList",
@@ -97,6 +253,7 @@
 				}
 			}
 		},
+
 		"/api/node/{nodeId}": {
 			"parameters": [
 				{
@@ -188,6 +345,7 @@
 				}
 			}
 		},
+
 		"/api/flow/{nodeId}": {
 			"parameters": [
 				{
@@ -251,6 +409,7 @@
 				}			
 			}
 		},
+
 		"/api/flow/xml/{flowId}": {
 			"parameters": [
 				{
@@ -326,9 +485,12 @@
 				}			
 			}		
 		}		
+
 	},
+	
 	"components": {
 		"schemas": {
+		
 			"User": {
 				"type": "object",
 				"properties": {
@@ -367,6 +529,7 @@
 					}
 				}
 			},
+
 			"Flow": {
 				"type": "object",
 				"properties": {
@@ -388,6 +551,7 @@
 					}
 				}
 			},
+
 			"FlowXml": {
 				"type": "object",
 				"properties": {

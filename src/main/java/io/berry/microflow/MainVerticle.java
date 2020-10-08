@@ -5,6 +5,7 @@ import java.util.Map;
 
 import io.berry.microflow.service.FlowManagerService;
 import io.berry.microflow.service.NodeManagerService;
+import io.berry.microflow.service.UserManagerService;
 import io.vertx.config.ConfigRetriever;
 import io.vertx.config.ConfigRetrieverOptions;
 import io.vertx.config.ConfigStoreOptions;
@@ -130,6 +131,15 @@ public class MainVerticle extends AbstractVerticle {
 						.setAddress(serviceAddress)
 						.register(FlowManagerService.class, 
 								(FlowManagerService)serviceInteface);
+				service_consumers.put(serviceAddress, consumer);
+				LOGGER.info("service: bind=" + serviceAddress);
+				break;
+			case "user_manager.app":
+				serviceInteface = FlowManagerService.create(service_conf);
+				consumer = serviceBinder
+						.setAddress(serviceAddress)
+						.register(UserManagerService.class, 
+								(UserManagerService)serviceInteface);
 				service_consumers.put(serviceAddress, consumer);
 				LOGGER.info("service: bind=" + serviceAddress);
 				break;
