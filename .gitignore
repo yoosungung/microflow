@@ -1,3 +1,5 @@
 /target/
 /db/
 /.apt_generated/
+nohup.out
+*~
