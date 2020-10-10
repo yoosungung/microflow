@@ -2,10 +2,13 @@ package io.berry.microflow.service.impl;
 
 import io.berry.microflow.service.UserManagerService;
 import io.vertx.core.AsyncResult;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
+import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.core.logging.Logger;
 import io.vertx.core.logging.LoggerFactory;
+import io.vertx.ext.auth.jdbc.JDBCAuth;
 import io.vertx.ext.sql.SQLConnection;
 import io.vertx.ext.web.api.OperationRequest;
 import io.vertx.ext.web.api.OperationResponse;
@@ -14,8 +17,8 @@ public class UserManagerServiceImpl extends JdbcManagerServiceImpl implements Us
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(UserManagerServiceImpl.class);
 
-	private final JDBCAuth fauth;
-	private final String fpasswd_salt;
+	private JDBCAuth fauth;
+	private String fpasswd_salt;
 	
 	public UserManagerServiceImpl(JsonObject conf) {
 		super(conf);
@@ -25,15 +28,15 @@ public class UserManagerServiceImpl extends JdbcManagerServiceImpl implements Us
 		fauth = auth;
 	}
 
-	private String getPasswdSalt() {
+	private String getPasswordSalt() {
 		if(fpasswd_salt == null) {
-			fpasswd_salt = fauth.generatedSalt();
+			fpasswd_salt = fauth.generateSalt();
 		}
 		return fpasswd_salt;
 	}
 
-	private String getPasswdHsah(String raw_passwd, String passwd_salt) {
-		return fauth.computedHash(raw_passwd, passwd_salt);
+	private String getPasswordHash(String raw_passwd, String passwd_salt) {
+		return fauth.computeHash(raw_passwd, passwd_salt);
 	}
 
 	@Override
@@ -53,9 +56,9 @@ public class UserManagerServiceImpl extends JdbcManagerServiceImpl implements Us
 
 			conn.queryWithParams(sql, params, res -> {
 				conn.close(done -> {
-					   if (done.failed()) {
-						   throw new RuntimeException(done.cause());
-					   }
+					if (done.failed()) {
+						throw new RuntimeException(done.cause());
+					}
 					});
 				if(res.failed()) {
 					LOGGER.error("getUserList", res.cause());
@@ -82,8 +85,8 @@ public class UserManagerServiceImpl extends JdbcManagerServiceImpl implements Us
 				return;
 			}
 			final SQLConnection conn = ar.result();
-			final Sting passwd_salt = getPasswordSalt();
-			final Sting passwd_hash = getPasswordHash(body.getString("password"), passwd_salt);
+			final String passwd_salt = getPasswordSalt();
+			final String passwd_hash = getPasswordHash(body.getString("password"), passwd_salt);
 			
 			JsonArray params = new JsonArray();
 			String sql = "insert into user (username, password, password_salt) values (?, ?, ?) ";
@@ -92,10 +95,10 @@ public class UserManagerServiceImpl extends JdbcManagerServiceImpl implements Us
 				.add(passwd_salt);
 			conn.updateWithParams(sql, params, rs -> {
 				conn.close(done -> {
-					   if (done.failed()) {
-						   throw new RuntimeException(done.cause());
-					   }
-					});
+					if (done.failed()) {
+						throw new RuntimeException(done.cause());
+					}
+				});
 				if(rs.failed()) {
 					LOGGER.error("createUser", rs.cause());
 					resultHandler.handle(Future.failedFuture(rs.cause()));
@@ -123,10 +126,10 @@ public class UserManagerServiceImpl extends JdbcManagerServiceImpl implements Us
 
 			conn.queryWithParams(sql, params, res -> {
 				conn.close(done -> {
-					   if (done.failed()) {
-						   throw new RuntimeException(done.cause());
-					   }
-					});
+					if (done.failed()) {
+						throw new RuntimeException(done.cause());
+					}
+				});
 				if(res.failed()) {
 					LOGGER.error("getUser", res.cause());
 					resultHandler.handle(Future.failedFuture(ar.cause()));
@@ -154,7 +157,7 @@ public class UserManagerServiceImpl extends JdbcManagerServiceImpl implements Us
 			}
 			final SQLConnection conn = ar.result();
 			final String passwd_salt = getPasswordSalt();
-			final Sting passwd_hash = getPasswordHash(body.getString("password"), passwd_salt);
+			final String passwd_hash = getPasswordHash(body.getString("password"), passwd_salt);
 			
 			JsonArray params = new JsonArray();
 			String sql = "update user set password = ?, password_salt = ?  where username = ? ";
@@ -163,10 +166,10 @@ public class UserManagerServiceImpl extends JdbcManagerServiceImpl implements Us
 				.add(username);
 			conn.updateWithParams(sql, params, rs -> {
 				conn.close(done -> {
-					   if (done.failed()) {
-						   throw new RuntimeException(done.cause());
-					   }
-					});
+					if (done.failed()) {
+						throw new RuntimeException(done.cause());
+					}
+				});
 				if(rs.failed()) {
 					LOGGER.error("updateNode", rs.cause());
 					resultHandler.handle(Future.failedFuture(rs.cause()));
@@ -194,7 +197,7 @@ public class UserManagerServiceImpl extends JdbcManagerServiceImpl implements Us
 			}
 			final SQLConnection conn = ar.result();
 			String sql;
-			JsonArray params = new JsonArray()add(username);
+			JsonArray params = new JsonArray().add(username);
 			
 			sql = "delete from roles_perms where role in (select role from user_roles where username = ? ";
 			conn.updateWithParams(sql, params, rs -> {
@@ -254,10 +257,8 @@ public class UserManagerServiceImpl extends JdbcManagerServiceImpl implements Us
 				if(res.failed()) {
 					conn.close();
 					LOGGER.error("initServiceTables", res.cause());
-				} else
-					res.up
-					
-					if(res.updateRow() > 0) {
+				} else if(res.result().getUpdated() > 0) {
+					//TODO: syntex error
 					sql = "alter table user add constraint pk_username primary key (username) ";
 					conn.execute(sql, alter_res -> {
 						conn.close();
