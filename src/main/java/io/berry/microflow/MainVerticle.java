@@ -136,6 +136,7 @@ public class MainVerticle extends AbstractVerticle {
 				break;
 			case "user_manager.app":
 				serviceInteface = FlowManagerService.create(service_conf);
+				((UserManagerServiceImpl)serviceInteface).setAuth(App.getJdbcAuth("flowdb"));
 				consumer = serviceBinder
 						.setAddress(serviceAddress)
 						.register(UserManagerService.class, 
@@ -169,8 +170,7 @@ public class MainVerticle extends AbstractVerticle {
 				router.route().handler(SessionHandler.create(LocalSessionStore.create(vertx)));
 				
 				LOGGER.info("httpserver: auth=flowdb");
-				JDBCClient jdbcClient = (JDBCClient)App.dbcpools.get("flowdb");
-				JDBCAuth authProvider = JDBCAuth.create(vertx, jdbcClient);			
+				JDBCAuth authProvider = App.getJdbcAuth("flowdb");
 				AuthHandler redirectAuthHandler = RedirectAuthHandler.create(authProvider);
 				router.route("/statics/*").handler(redirectAuthHandler);
 				router.route("/loginpage").handler(rc -> rc.response().putHeader("content-type","text/html").end(getLoginHtml()));

@@ -24,6 +24,11 @@
 			"class":"FlowManagerService",
 			"jdbc":"flowdb",
 			"create_table": false
+		},
+		"user_manager.app": {
+			"class":"UserManagerService",
+			"jdbc":"flowdb",
+			"create_table": false
 		}
 	}
 }
