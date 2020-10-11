@@ -6,6 +6,7 @@ import java.util.Map;
 import io.berry.microflow.service.FlowManagerService;
 import io.berry.microflow.service.NodeManagerService;
 import io.berry.microflow.service.UserManagerService;
+import io.berry.microflow.service.impl.UserManagerServiceImpl;
 import io.vertx.config.ConfigRetriever;
 import io.vertx.config.ConfigRetrieverOptions;
 import io.vertx.config.ConfigStoreOptions;

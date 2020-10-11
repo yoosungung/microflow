@@ -5,6 +5,8 @@ import java.util.Map;
 
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
+import io.vertx.ext.auth.jdbc.JDBCAuth;
+import io.vertx.ext.jdbc.JDBCClient;
 import io.vertx.ext.sql.SQLClient;
 
 public class App {
