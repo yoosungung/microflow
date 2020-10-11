@@ -248,46 +248,70 @@ public class UserManagerServiceImpl extends JdbcManagerServiceImpl implements Us
 				return;
 			}
 			final SQLConnection conn = ar.result();
-			String sql = "create table if not exists user ( "
+			final String user_sql = "create table if not exists user ( "
 					+ "username varchar(255) not null, "
 					+ "passwd varchar(255) not null, "
 					+ "password_salt carchar(255) not null "
 					+ ") ";
-			conn.execute(sql, res -> {
+			conn.execute(user_sql, res -> {
 				if(res.failed()) {
-					conn.close();
-					LOGGER.error("initServiceTables", res.cause());
-				} else if(res.result().getUpdated() > 0) {
-					//TODO: syntex error
-					sql = "alter table user add constraint pk_username primary key (username) ";
-					conn.execute(sql, alter_res -> {
-						conn.close();
+					LOGGER.error("initServiceTables - user", res.cause());
+				} else {
+					final String pkusername_sql = "alter table user add constraint pk_username primary key (username) ";
+					conn.execute(pkusername_sql, alter_res -> {
 						if(alter_res.failed()) {
-							LOGGER.error("initServiceTables", res.cause());
+							LOGGER.error("initServiceTables - pk_username", res.cause());
 						}
 					});
 				}
 			});
-			sql = "create table if not exists user_roles ( "
+			final String userroles_sql = "create table if not exists user_roles ( "
 					+ "username varchar(255) not null, "
 					+ "role varchar(255 not null "
 					+ ") ";
-			conn.execute(sql, res -> {
-				conn.close();
+			conn.execute(userroles_sql, res -> {
 				if(res.failed()) {
-					LOGGER.error("initServiceTables", res.cause());
+					LOGGER.error("initServiceTables - user_roles", res.cause());
+				} else {
+					final String pkuserroles_sql = "alter table user_roles add constraint pk_user_roles primary key (username, role) ";
+					conn.execute(pkuserroles_sql, alter_res -> {
+						if(alter_res.failed()) {
+							LOGGER.error("initServiceTables - pk_user_roles", res.cause());
+						}
+					});
+					final String fkusername_sql = "alter table user_roles add constraint fk_username foreign key (username) references user(username) ";
+					conn.execute(fkusername_sql, alter_res -> {
+						if(alter_res.failed()) {
+							LOGGER.error("initServiceTables - fk_username", res.cause());
+						}
+					});
 				}
 			});
-			sql = "create table if not exists user_roles ( "
+			final String rolesperms_sql = "create table if not exists roles_perms ( "
 					+ "role varchar(255) not null, "
-					+ "rerm varchar(255 not null "
+					+ "perm varchar(255 not null "
 					+ ") ";
-			conn.execute(sql, res -> {
-				conn.close();
+			conn.execute(rolesperms_sql, res -> {
 				if(res.failed()) {
-					LOGGER.error("initServiceTables", res.cause());
+					LOGGER.error("initServiceTables - user_roles", res.cause());
+				} else {
+					final String pkrolesperms_sql = "alter table roles_perms add constraint pk_roles_perms primary key (role) ";
+					conn.execute(pkrolesperms_sql, alter_res -> {
+						if(alter_res.failed()) {
+							LOGGER.error("initServiceTables - pk_roles_perms", res.cause());
+						}
+					});
+					final String fkroles_sql = "alter table user_roles add constraint fk_roles foreign key (role) references roles_perms(role) ";
+					conn.execute(fkroles_sql, alter_res -> {
+						if(alter_res.failed()) {
+							LOGGER.error("initServiceTables - fk_roles", res.cause());
+						}
+					});
 				}
 			});
+
+			conn.close();
+
 		});
 	}
 
