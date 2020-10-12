@@ -6,7 +6,6 @@ import java.util.Map;
 import io.berry.microflow.service.FlowManagerService;
 import io.berry.microflow.service.NodeManagerService;
 import io.berry.microflow.service.UserManagerService;
-import io.berry.microflow.service.impl.UserManagerServiceImpl;
 import io.vertx.config.ConfigRetriever;
 import io.vertx.config.ConfigRetrieverOptions;
 import io.vertx.config.ConfigStoreOptions;
@@ -113,35 +112,33 @@ public class MainVerticle extends AbstractVerticle {
 
 			String serviceAddress = service.getKey();
 			ServiceBinder serviceBinder = new ServiceBinder(this.vertx);
-			Object serviceInteface;
 			MessageConsumer<JsonObject> consumer;
 			
 			switch(serviceAddress) {
 			case "node_manager.app":
-				serviceInteface = NodeManagerService.create(service_conf);
+				NodeManagerService nodeserviceInteface = NodeManagerService.create(service_conf);
 				consumer = serviceBinder
 						.setAddress(serviceAddress)
 						.register(NodeManagerService.class, 
-								(NodeManagerService)serviceInteface);
+								(NodeManagerService)nodeserviceInteface);
 				service_consumers.put(serviceAddress, consumer);
 				LOGGER.info("service: bind=" + serviceAddress);
 				break;
 			case "flow_manager.app":
-				serviceInteface = FlowManagerService.create(service_conf);
+				FlowManagerService flowserviceInteface = FlowManagerService.create(service_conf);
 				consumer = serviceBinder
 						.setAddress(serviceAddress)
 						.register(FlowManagerService.class, 
-								(FlowManagerService)serviceInteface);
+								(FlowManagerService)flowserviceInteface);
 				service_consumers.put(serviceAddress, consumer);
 				LOGGER.info("service: bind=" + serviceAddress);
 				break;
 			case "user_manager.app":
-				serviceInteface = FlowManagerService.create(service_conf);
-				((UserManagerServiceImpl)serviceInteface).setAuth(App.getJdbcAuth("flowdb"));
+				UserManagerService userserviceInteface = UserManagerService.create(service_conf);
 				consumer = serviceBinder
 						.setAddress(serviceAddress)
 						.register(UserManagerService.class, 
-								(UserManagerService)serviceInteface);
+								(UserManagerService)userserviceInteface);
 				service_consumers.put(serviceAddress, consumer);
 				LOGGER.info("service: bind=" + serviceAddress);
 				break;

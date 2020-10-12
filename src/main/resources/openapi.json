@@ -55,7 +55,7 @@
 						}
 					}
 				},
-				"repose": {
+				"responses": {
 					"200": {
 						"description": "Ok"
 					},
@@ -70,11 +70,11 @@
 		},
 		
 		"/api/user/{username}": {
-			"parameter": [
+			"parameters": [
 				{
 					"name": "username",
 					"in": "path",
-					"require": true,
+					"required": true,
 					"schema": {
 						"type": "string"
 					}

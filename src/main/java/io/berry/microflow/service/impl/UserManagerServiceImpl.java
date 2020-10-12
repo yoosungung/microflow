@@ -1,5 +1,6 @@
 package io.berry.microflow.service.impl;
 
+import io.berry.microflow.App;
 import io.berry.microflow.service.UserManagerService;
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Future;
@@ -24,19 +25,22 @@ public class UserManagerServiceImpl extends JdbcManagerServiceImpl implements Us
 		super(conf);
 	}
 
-	public void setAuth(JDBCAuth auth) {
-		fauth = auth;
+	private JDBCAuth getAuth() {
+		if(fauth == null) {
+			fauth = App.getJdbcAuth("flowdb");
+		}
+		return fauth;
 	}
 
 	private String getPasswordSalt() {
 		if(fpasswd_salt == null) {
-			fpasswd_salt = fauth.generateSalt();
+			fpasswd_salt = getAuth().generateSalt();
 		}
 		return fpasswd_salt;
 	}
 
 	private String getPasswordHash(String raw_passwd, String passwd_salt) {
-		return fauth.computeHash(raw_passwd, passwd_salt);
+		return getAuth().computeHash(raw_passwd, passwd_salt);
 	}
 
 	@Override
